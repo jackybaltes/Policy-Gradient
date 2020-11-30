@@ -1,0 +1,2487 @@
+<!doctype html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
+        <title>Policy Gradient</title>
+
+        <link rel="stylesheet" href="css/reveal.css">
+        <link rel="stylesheet" href="css/theme/ntnuerc.css">
+
+        <!-- Theme used for syntax highlighting of code -->
+        <link rel="stylesheet" href="lib/css/zenburn.css">
+        <script src="https://daybrush.com/scenejs/release/latest/dist/scene.min.js"></script>
+		
+        <!-- Printing and PDF exports -->
+        <script>
+            var link = document.createElement( 'link' );
+            link.rel = 'stylesheet';
+            link.type = 'text/css';
+            link.href = window.location.search.match( /print-pdf/gi ) ? 'css/print/pdf.css' : 'css/print/paper.css';
+            document.getElementsByTagName( 'head' )[0].appendChild( link );
+        </script>
+        <script src="js/ntnu.js"></script>
+    </head>
+    <body>
+        <div class="reveal">
+        <div class="slides">
+            
+<section id="start" data-state="start">
+
+
+<!-- Header -->
+  
+
+<!-- Background -->
+
+
+<!-- Slide -->
+<div class="jb-slide">
+
+<div class="jb-output-code jb-render">
+
+<!-- start embedded style -->
+
+<!-- end embedded style -->
+<div class="jb-output jb-render">
+
+<h1>Policy Gradient</h1>
+
+<p>
+      Jacky Baltes<br>
+      National Taiwan Normal University<br>
+      Taipei, Taiwan<br>
+      <a href="mailto:jacky.baltes@ntnu.edu.tw">jacky.baltes@ntnu.edu.tw</a><br>
+</p>
+
+30 November 2020
+</div><!-- end of jb-output jb-render -->
+</div><!-- end of jb-output-code jb-render -->
+
+
+</div>
+<!-- Footer -->
+
+<div class="jb-footer-left plain">
+    <span id="id-6ae8a950-98a6-40b8-9470-64557af159c9" ><span id="id-6ae8a950-98a6-40b8-9470-64557af159c9"><img id="img-id-6ae8a950-98a6-40b8-9470-64557af159c9"     src="assets/images/logo.png"/></span>
+</span>
+
+</div>
+<div class="jb-footer-right plain">
+    <span id="id-728dd84d-b714-4277-8aec-62c40dfa6ff3" ><span id="id-728dd84d-b714-4277-8aec-62c40dfa6ff3"><img id="img-id-728dd84d-b714-4277-8aec-62c40dfa6ff3" width="162" height="138"   src="assets/images/robbi.png"/></span>
+</span>
+
+</div>
+
+<aside class="notes">
+
+</aside>
+
+
+
+</section>
+<section id="slide_00003_frag_00001" data-state="slide_00003_frag_00001">
+
+
+<!-- Header -->
+  
+
+<!-- Background -->
+
+
+<!-- Slide -->
+<div class="jb-slide">
+
+<div class="jb-output-code jb-render">
+
+<!-- start embedded style -->
+
+<!-- end embedded style -->
+<div class="jb-output jb-render">
+<div class="document">
+<div class="jb-text docutils container">
+<p>So far, we used either a value function <em>V(s)</em> or an action-value function <em>Q(s,a)</em> to
+learn knowledge about the domain</p>
+<p>A policy is then derived from the value function or action-value function</p>
+<p>An example is the <em>Ɛ</em>-Greedy policy</p>
+</div>
+</div>
+
+</div><!-- end of jb-output jb-render -->
+</div><!-- end of jb-output-code jb-render -->
+
+
+</div>
+<!-- Footer -->
+
+<div class="jb-footer-left plain">
+    <span id="id-f4541a93-3fed-4756-9510-94d851b344f8" ><span id="id-f4541a93-3fed-4756-9510-94d851b344f8"><img id="img-id-f4541a93-3fed-4756-9510-94d851b344f8"     src="assets/images/logo.png"/></span>
+</span>
+
+</div>
+<div class="jb-footer-right plain">
+    <span id="id-7c7c4f3b-b5fc-4182-9e23-dddbeeaa231e" ><span id="id-7c7c4f3b-b5fc-4182-9e23-dddbeeaa231e"><img id="img-id-7c7c4f3b-b5fc-4182-9e23-dddbeeaa231e" width="162" height="138"   src="assets/images/robbi.png"/></span>
+</span>
+
+</div>
+
+<aside class="notes">
+
+</aside>
+
+
+
+</section>
+<section id="slide_00004_frag_00001" data-state="slide_00004_frag_00001">
+
+
+<!-- Header -->
+  
+
+<!-- Background -->
+
+
+<!-- Slide -->
+<div class="jb-slide">
+
+<div class="jb-output-code jb-render">
+
+<!-- start embedded style -->
+
+<!-- end embedded style -->
+<div class="jb-output jb-render">
+
+<div class="jb-text">
+<p>Not clear if value or action-value representation is the best representation of learned knowledge</p>
+
+<p>Policy for a Markov reward process (MRP)</p>
+
+<p>In policy gradient, we parameterize the policy <emph>π</emph> directly</p>
+    <div class="jb-math" style="background:white;text-align:center">
+    <span id="id-bd0a998e-5ec0-413f-bbc9-05c611e1f0e5" ><span id="id-bd0a998e-5ec0-413f-bbc9-05c611e1f0e5"><img id="img-id-bd0a998e-5ec0-413f-bbc9-05c611e1f0e5"     src="assets/images/eq1.svg"/></span>
+</span>
+
+    </div>
+    where <emph>θ</emph> is a parameterization of the policy
+</div>
+</div><!-- end of jb-output jb-render -->
+</div><!-- end of jb-output-code jb-render -->
+
+
+</div>
+<!-- Footer -->
+
+<div class="jb-footer-left plain">
+    <span id="id-370537ae-114b-48e4-8190-ec2e85df90d8" ><span id="id-370537ae-114b-48e4-8190-ec2e85df90d8"><img id="img-id-370537ae-114b-48e4-8190-ec2e85df90d8"     src="assets/images/logo.png"/></span>
+</span>
+
+</div>
+<div class="jb-footer-right plain">
+    <span id="id-2bb0e434-e57a-4ee5-9525-f8ac6b2c8fed" ><span id="id-2bb0e434-e57a-4ee5-9525-f8ac6b2c8fed"><img id="img-id-2bb0e434-e57a-4ee5-9525-f8ac6b2c8fed" width="162" height="138"   src="assets/images/robbi.png"/></span>
+</span>
+
+</div>
+
+<aside class="notes">
+
+</aside>
+
+
+
+</section>
+<section id="slide_00005_frag_00001" data-state="slide_00005_frag_00001">
+
+
+<!-- Header -->
+  
+
+<!-- Background -->
+
+
+<!-- Slide -->
+<div class="jb-slide">
+
+<div class="jb-output-code jb-render">
+
+<!-- start embedded style -->
+
+<!-- end embedded style -->
+<div class="jb-output jb-render">
+
+<h1>Value-based vs. Policy-based Reinforcement Learning</h1>
+
+<table>
+<tr>
+<td style="width:70%; font-size:0.5em">
+<ul>
+<li>Value-based
+<ul>
+<li>Learnt Value function</li>
+<li>Implicit policy</li>
+</ul>
+</li>
+<li>Policy-based
+<ul>
+<li>No Value function</li>
+<li>Learnt policy</li>
+</ul>
+</li>
+<li>Actor-Critic
+<ul>
+<li>Learnt Value function</li>
+<li>Learnt policy</li>
+</ul>
+</li>
+</ul>
+</td>
+<td>
+<span id="id-ffe71b09-8407-4f7d-aed9-091ae49c03a4" ><span id="id-ffe71b09-8407-4f7d-aed9-091ae49c03a4"><img id="img-id-ffe71b09-8407-4f7d-aed9-091ae49c03a4"     src="assets/images/v1.svg"/></span>
+</span>
+
+</td>
+</tr>
+</table>
+</div><!-- end of jb-output jb-render -->
+</div><!-- end of jb-output-code jb-render -->
+
+
+</div>
+<!-- Footer -->
+
+<div class="jb-footer-left plain">
+    <span id="id-3bcf367d-10a9-4200-a753-c40ef3273697" ><span id="id-3bcf367d-10a9-4200-a753-c40ef3273697"><img id="img-id-3bcf367d-10a9-4200-a753-c40ef3273697"     src="assets/images/logo.png"/></span>
+</span>
+
+</div>
+<div class="jb-footer-right plain">
+    <span id="id-5c183cb7-06e3-41e5-a52c-ce5eb79ed35f" ><span id="id-5c183cb7-06e3-41e5-a52c-ce5eb79ed35f"><img id="img-id-5c183cb7-06e3-41e5-a52c-ce5eb79ed35f" width="162" height="138"   src="assets/images/robbi.png"/></span>
+</span>
+
+</div>
+
+<aside class="notes">
+
+</aside>
+
+
+
+</section>
+<section id="slide_00006_frag_00001" data-state="slide_00006_frag_00001">
+
+
+<!-- Header -->
+  
+
+<!-- Background -->
+
+
+<!-- Slide -->
+<div class="jb-slide">
+
+<div class="jb-output-code jb-render">
+
+<!-- start embedded style -->
+
+<!-- end embedded style -->
+<div class="jb-output jb-render">
+
+<h1>Value-based vs. Policy-based Reinforcement Learning</h1>
+
+<table>
+<tr>
+<td style="width:70%; font-size:0.5em">
+<ul>
+<li>Value-based
+<ul>
+<li>Learnt Value function</li>
+<li>Implicit policy</li>
+</ul>
+</li>
+<li>Policy-based
+<ul>
+<li>No Value function</li>
+<li>Learnt policy</li>
+</ul>
+</li>
+<li>Actor-Critic
+<ul>
+<li>Learnt Value function</li>
+<li>Learned policy</li>
+</ul>
+</li>
+</ul>
+</td>
+<td>
+<span id="id-4025aacf-279f-4ca3-88df-88ebfad17d14" ><span id="id-4025aacf-279f-4ca3-88df-88ebfad17d14"><img id="img-id-4025aacf-279f-4ca3-88df-88ebfad17d14"     src="assets/images/v1.svg"/></span>
+</span>
+
+</td>
+</tr>
+</table>
+</div><!-- end of jb-output jb-render -->
+</div><!-- end of jb-output-code jb-render -->
+
+
+</div>
+<!-- Footer -->
+
+<div class="jb-footer-left plain">
+    <span id="id-482d4e56-7a1a-4812-9ab2-0bd15e09cc1a" ><span id="id-482d4e56-7a1a-4812-9ab2-0bd15e09cc1a"><img id="img-id-482d4e56-7a1a-4812-9ab2-0bd15e09cc1a"     src="assets/images/logo.png"/></span>
+</span>
+
+</div>
+<div class="jb-footer-right plain">
+    <span id="id-99201ceb-504d-41a4-8ebc-d9b24686517c" ><span id="id-99201ceb-504d-41a4-8ebc-d9b24686517c"><img id="img-id-99201ceb-504d-41a4-8ebc-d9b24686517c" width="162" height="138"   src="assets/images/robbi.png"/></span>
+</span>
+
+</div>
+
+<aside class="notes">
+
+</aside>
+
+
+
+</section>
+<section id="slide_00007_frag_00001" data-state="slide_00007_frag_00001">
+
+
+<!-- Header -->
+  
+
+<!-- Background -->
+
+
+<!-- Slide -->
+<div class="jb-slide">
+
+<div class="jb-output-code jb-render">
+
+<!-- start embedded style -->
+
+<!-- end embedded style -->
+<div class="jb-output jb-render">
+
+<h1>Value-based vs. Policy-based Reinforcement Learning</h1>
+
+<table>
+<tr>
+<td style="width:70%; font-size:0.5em">
+<ul>
+<li>Value-based
+<ul>
+<li>Learnt Value function</li>
+<li>Implicit policy</li>
+</ul>
+</li>
+<li>Policy-based
+<ul>
+<li>No Value function</li>
+<li>Learned policy</li>
+</ul>
+</li>
+<li>Actor-Critic
+<ul>
+<li>Learnt Value function</li>
+<li>Learned policy</li>
+</ul>
+</li>
+</ul>
+</td>
+<td>
+<span id="id-140b3a4b-97b9-4e31-8462-738758d28e00" ><span id="id-140b3a4b-97b9-4e31-8462-738758d28e00"><img id="img-id-140b3a4b-97b9-4e31-8462-738758d28e00"     src="assets/images/v1.svg"/></span>
+</span>
+
+</td>
+</tr>
+</table>
+</div><!-- end of jb-output jb-render -->
+</div><!-- end of jb-output-code jb-render -->
+
+
+</div>
+<!-- Footer -->
+
+<div class="jb-footer-left plain">
+    <span id="id-913ef291-17a7-4fcf-b307-6a20b9be8b39" ><span id="id-913ef291-17a7-4fcf-b307-6a20b9be8b39"><img id="img-id-913ef291-17a7-4fcf-b307-6a20b9be8b39"     src="assets/images/logo.png"/></span>
+</span>
+
+</div>
+<div class="jb-footer-right plain">
+    <span id="id-68bd4174-0053-4031-a532-37e90c4827f6" ><span id="id-68bd4174-0053-4031-a532-37e90c4827f6"><img id="img-id-68bd4174-0053-4031-a532-37e90c4827f6" width="162" height="138"   src="assets/images/robbi.png"/></span>
+</span>
+
+</div>
+
+<aside class="notes">
+
+</aside>
+
+
+
+</section>
+<section id="slide_00008_frag_00001" data-state="slide_00008_frag_00001">
+
+
+<!-- Header -->
+  
+
+<!-- Background -->
+
+
+<!-- Slide -->
+<div class="jb-slide">
+
+<div class="jb-output-code jb-render">
+
+<!-- start embedded style -->
+
+<!-- end embedded style -->
+<div class="jb-output jb-render">
+
+<h1>Value-based vs. Policy-based Reinforcement Learning</h1>
+
+<table>
+<tr>
+<td style="width:70%; font-size:0.5em">
+<ul>
+<li>Value-based
+<ul>
+<li>Learnt Value function</li>
+<li>Implicit policy</li>
+</ul>
+</li>
+<li>Policy-based
+<ul>
+<li>No Value function</li>
+<li>Learned policy</li>
+</ul>
+</li>
+<li>Actor-Critic
+<ul>
+<li>Learned Value function</li>
+<li>Learned policy</li>
+</ul>
+</li>
+</ul>
+</td>
+<td>
+<span id="id-e62ac5de-d5ba-4bdc-aebc-18ce583422ea" ><span id="id-e62ac5de-d5ba-4bdc-aebc-18ce583422ea"><img id="img-id-e62ac5de-d5ba-4bdc-aebc-18ce583422ea"     src="assets/images/v1.svg"/></span>
+</span>
+
+</td>
+</tr>
+</table>
+</div><!-- end of jb-output jb-render -->
+</div><!-- end of jb-output-code jb-render -->
+
+
+</div>
+<!-- Footer -->
+
+<div class="jb-footer-left plain">
+    <span id="id-51053fa5-351f-4bd3-a6ad-38add2b7fbd8" ><span id="id-51053fa5-351f-4bd3-a6ad-38add2b7fbd8"><img id="img-id-51053fa5-351f-4bd3-a6ad-38add2b7fbd8"     src="assets/images/logo.png"/></span>
+</span>
+
+</div>
+<div class="jb-footer-right plain">
+    <span id="id-6a6b05e2-a58e-4ec8-a1ff-188008ed79a1" ><span id="id-6a6b05e2-a58e-4ec8-a1ff-188008ed79a1"><img id="img-id-6a6b05e2-a58e-4ec8-a1ff-188008ed79a1" width="162" height="138"   src="assets/images/robbi.png"/></span>
+</span>
+
+</div>
+
+<aside class="notes">
+
+</aside>
+
+
+
+</section>
+<section id="slide_00009_frag_00001" data-state="slide_00009_frag_00001">
+
+
+<!-- Header -->
+  
+
+<!-- Background -->
+
+
+<!-- Slide -->
+<div class="jb-slide">
+
+<div class="jb-output-code jb-render">
+
+<!-- start embedded style -->
+
+<!-- end embedded style -->
+<div class="jb-output jb-render">
+
+<h1>Value-based vs. Policy-based Reinforcement Learning</h1>
+
+<table>
+<tr>
+<td style="width:70%; font-size:0.5em">
+<ul>
+<li>Value-based
+<ul>
+<li>Learned Value function</li>
+<li>Implicit policy</li>
+</ul>
+</li>
+<li>Policy-based
+<ul>
+<li>No Value function</li>
+<li>Learned policy</li>
+</ul>
+</li>
+<li>Actor-Critic
+<ul>
+<li>Learned Value function</li>
+<li>Learned policy</li>
+</ul>
+</li>
+</ul>
+</td>
+<td>
+<span id="id-809d2217-e71a-44f5-beed-0b592c127efc" ><span id="id-809d2217-e71a-44f5-beed-0b592c127efc"><img id="img-id-809d2217-e71a-44f5-beed-0b592c127efc"     src="assets/images/v1.svg"/></span>
+</span>
+
+</td>
+</tr>
+</table>
+</div><!-- end of jb-output jb-render -->
+</div><!-- end of jb-output-code jb-render -->
+
+
+</div>
+<!-- Footer -->
+
+<div class="jb-footer-left plain">
+    <span id="id-d2c7168c-9e4b-400c-a4a8-c828695522f8" ><span id="id-d2c7168c-9e4b-400c-a4a8-c828695522f8"><img id="img-id-d2c7168c-9e4b-400c-a4a8-c828695522f8"     src="assets/images/logo.png"/></span>
+</span>
+
+</div>
+<div class="jb-footer-right plain">
+    <span id="id-95605a8d-ff13-4a7e-a437-e6a8aefa399f" ><span id="id-95605a8d-ff13-4a7e-a437-e6a8aefa399f"><img id="img-id-95605a8d-ff13-4a7e-a437-e6a8aefa399f" width="162" height="138"   src="assets/images/robbi.png"/></span>
+</span>
+
+</div>
+
+<aside class="notes">
+
+</aside>
+
+
+
+</section>
+<section id="slide_00010_frag_00001" data-state="slide_00010_frag_00001">
+
+
+<!-- Header -->
+  
+
+<!-- Background -->
+
+
+<!-- Slide -->
+<div class="jb-slide">
+
+<div class="jb-output-code jb-render">
+
+<!-- start embedded style -->
+
+<!-- end embedded style -->
+<div class="jb-output jb-render">
+
+<h1>Value-based vs. Policy-based Reinforcement Learning</h1>
+
+<table>
+<tr>
+<td style="width:70%; font-size:0.5em">
+<ul>
+<li>Value-based
+<ul>
+<li>Learnt Value function</li>
+<li>Implicit policy</li>
+</ul>
+</li>
+<li>Policy-based
+<ul>
+<li>No Value function</li>
+<li>Learnt policy</li>
+</ul>
+</li>
+<li>Actor-Critic
+<ul>
+<li>Learnt Value function</li>
+<li>Learnt policy</li>
+</ul>
+</li>
+</ul>
+</td>
+<td>
+<span id="id-2c155403-98be-44d5-a384-6dd6560e07d0" ><span id="id-2c155403-98be-44d5-a384-6dd6560e07d0"><img id="img-id-2c155403-98be-44d5-a384-6dd6560e07d0"     src="assets/images/v1.svg"/></span>
+</span>
+
+</td>
+</tr>
+</table>
+</div><!-- end of jb-output jb-render -->
+</div><!-- end of jb-output-code jb-render -->
+
+
+</div>
+<!-- Footer -->
+
+<div class="jb-footer-left plain">
+    <span id="id-6e4a42f5-ca06-49cf-9078-e1c15292a064" ><span id="id-6e4a42f5-ca06-49cf-9078-e1c15292a064"><img id="img-id-6e4a42f5-ca06-49cf-9078-e1c15292a064"     src="assets/images/logo.png"/></span>
+</span>
+
+</div>
+<div class="jb-footer-right plain">
+    <span id="id-546da2fa-550c-456f-baea-9d3d8cfaf69a" ><span id="id-546da2fa-550c-456f-baea-9d3d8cfaf69a"><img id="img-id-546da2fa-550c-456f-baea-9d3d8cfaf69a" width="162" height="138"   src="assets/images/robbi.png"/></span>
+</span>
+
+</div>
+
+<aside class="notes">
+
+</aside>
+
+
+
+</section>
+<section id="slide_00011_frag_00001" data-state="slide_00011_frag_00001">
+
+
+<!-- Header -->
+  
+
+<!-- Background -->
+
+
+<!-- Slide -->
+<div class="jb-slide">
+
+<div class="jb-output-code jb-render">
+
+<!-- start embedded style -->
+
+<!-- end embedded style -->
+<div class="jb-output jb-render">
+<div class="document" id="policy-based-approach">
+<h1 class="title">Policy-based Approach</h1>
+<div class="jb-text docutils container">
+<p>Advantages</p>
+<ul class="simple">
+<li>Better convergence properties</li>
+<li>High-dimensional or continuous action spaces</li>
+<li>Policy may be probabilistic</li>
+</ul>
+<p>Disadvantages</p>
+<ul class="simple">
+<li>Find local maximum, not global maximum.
+Apply random restart to try and improve current local maximum</li>
+<li>Evaluating policy is inefficient</li>
+<li>Problematic if variance of the policy is high</li>
+</ul>
+</div>
+</div>
+
+</div><!-- end of jb-output jb-render -->
+</div><!-- end of jb-output-code jb-render -->
+
+
+</div>
+<!-- Footer -->
+
+<div class="jb-footer-left plain">
+    <span id="id-6f001409-0393-421b-95d1-7f754787bf27" ><span id="id-6f001409-0393-421b-95d1-7f754787bf27"><img id="img-id-6f001409-0393-421b-95d1-7f754787bf27"     src="assets/images/logo.png"/></span>
+</span>
+
+</div>
+<div class="jb-footer-right plain">
+    <span id="id-933c183e-fc6c-44a2-864b-d0ae68386043" ><span id="id-933c183e-fc6c-44a2-864b-d0ae68386043"><img id="img-id-933c183e-fc6c-44a2-864b-d0ae68386043" width="162" height="138"   src="assets/images/robbi.png"/></span>
+</span>
+
+</div>
+
+<aside class="notes">
+
+</aside>
+
+
+
+</section>
+<section id="slide_00012_frag_00001" data-state="slide_00012_frag_00001">
+
+
+<!-- Header -->
+  
+
+<!-- Background -->
+
+
+<!-- Slide -->
+<div class="jb-slide">
+<div class="jb-input jb-render jb-code" style="text-align:center">
+
+<!-- start embedded style -->
+
+<!-- end embedded style -->
+<div class="jb-input-code jb-render">
+<div class="highlight" style="background: #f8f8f8; color:#101010;display=inline-block;"><pre style="line-height: 125%"><span></span>transitions <span style="color: #666666">=</span> np<span style="color: #666666">.</span>array( [ [ <span style="color: #666666">1</span>, <span style="color: #666666">0</span>, <span style="color: #666666">2</span> ],
+                          [ <span style="color: #666666">3</span>, <span style="color: #666666">3</span>, <span style="color: #666666">0</span> ],
+                          [ <span style="color: #666666">1</span>, <span style="color: #666666">3</span>, <span style="color: #666666">0</span>, ] ] )
+
+rewards <span style="color: #666666">=</span> np<span style="color: #666666">.</span>array( [ [ <span style="color: #666666">0</span>, <span style="color: #666666">-5</span>, <span style="color: #666666">0</span> ],
+                      [ <span style="color: #666666">-50</span>, <span style="color: #666666">100</span>, <span style="color: #666666">-1</span> ],
+                      [ <span style="color: #666666">-10</span>, <span style="color: #666666">10</span>, <span style="color: #666666">-1</span> ] ] )
+
+<span style="color: #008000; font-weight: bold">def</span> <span style="color: #0000FF">successor</span>( s, a, transitions, rewards ):
+  ns <span style="color: #666666">=</span> transitions[s,a]
+  r <span style="color: #666666">=</span> rewards[s,a]
+  <span style="color: #008000; font-weight: bold">return</span> ns, r
+
+<span style="color: #008000; font-weight: bold">def</span> <span style="color: #0000FF">applyPolicy</span>( pol, s ):
+  val <span style="color: #666666">=</span> [ p <span style="color: #008000; font-weight: bold">for</span> p <span style="color: #AA22FF; font-weight: bold">in</span> pol[s] ]
+  <span style="color: #008000; font-weight: bold">for</span> i <span style="color: #AA22FF; font-weight: bold">in</span> <span style="color: #008000">range</span>(<span style="color: #008000">len</span>(val)):
+    v <span style="color: #666666">=</span> val[i]
+    <span style="color: #008000; font-weight: bold">if</span> (v <span style="color: #666666">&lt;</span> <span style="color: #666666">0.0</span> ):
+      v <span style="color: #666666">=</span> <span style="color: #666666">0.0</span>
+    <span style="color: #008000; font-weight: bold">elif</span> ( v <span style="color: #666666">&gt;</span> <span style="color: #666666">1.0</span>):
+      v <span style="color: #666666">=</span> <span style="color: #666666">1.0</span>
+    val[i] <span style="color: #666666">=</span> v
+  
+  vSum <span style="color: #666666">=</span> <span style="color: #008000">sum</span>(val)
+  <span style="color: #008000; font-weight: bold">if</span> (vSum <span style="color: #666666">&gt;</span> <span style="color: #666666">1</span>):
+    <span style="color: #008000; font-weight: bold">for</span> i <span style="color: #AA22FF; font-weight: bold">in</span> <span style="color: #008000">range</span>(<span style="color: #008000">len</span>(val)):
+      v <span style="color: #666666">=</span> val[i]<span style="color: #666666">/</span>(<span style="color: #666666">1.00*</span>vSum)
+
+  val<span style="color: #666666">.</span>append(<span style="color: #666666">1-</span><span style="color: #008000">sum</span>(val))
+
+  cpol <span style="color: #666666">=</span> np<span style="color: #666666">.</span>cumsum( val )
+  r <span style="color: #666666">=</span> random<span style="color: #666666">.</span>random()
+  a <span style="color: #666666">=</span> <span style="color: #666666">0</span>
+  <span style="color: #008000; font-weight: bold">while</span>( a <span style="color: #666666">&lt;</span> <span style="color: #008000">len</span>(pol) <span style="color: #AA22FF; font-weight: bold">and</span> ( cpol[a] <span style="color: #666666">&lt;</span> r ) ):
+    a <span style="color: #666666">=</span> a <span style="color: #666666">+</span> <span style="color: #666666">1</span>
+  <span style="color: #008000; font-weight: bold">return</span> a
+</pre></div>
+
+</div><!-- end of jb-input-code jb-render -->
+
+</div>
+
+</div>
+<!-- Footer -->
+
+<div class="jb-footer-left plain">
+    <span id="id-afb05890-aec0-49f8-be0d-df0d4c41d0a2" ><span id="id-afb05890-aec0-49f8-be0d-df0d4c41d0a2"><img id="img-id-afb05890-aec0-49f8-be0d-df0d4c41d0a2"     src="assets/images/logo.png"/></span>
+</span>
+
+</div>
+<div class="jb-footer-right plain">
+    <span id="id-2167a055-4e17-4a8e-8630-99551eeaa857" ><span id="id-2167a055-4e17-4a8e-8630-99551eeaa857"><img id="img-id-2167a055-4e17-4a8e-8630-99551eeaa857" width="162" height="138"   src="assets/images/robbi.png"/></span>
+</span>
+
+</div>
+
+<aside class="notes">
+
+</aside>
+
+
+
+</section>
+<section id="slide_00013_frag_00001" data-state="slide_00013_frag_00001">
+
+
+<!-- Header -->
+  
+
+<!-- Background -->
+
+
+<!-- Slide -->
+<div class="jb-slide">
+
+<div class="jb-output-code jb-render">
+
+<!-- start embedded style -->
+
+<!-- end embedded style -->
+<div class="jb-output jb-render">
+
+<h1>Policy Objective Function</h1>
+
+<div class="jb-text">
+<p>Given policy $\pi_\theta(s,a)$ with parameters $\theta$, find best $\theta$</p>
+
+<p>Evaluate policy $\pi_{\theta}$</p>
+
+<ul>
+<li>Given an entire episode: $$J_{1}(\theta) = V^{\pi_{\theta}}(s_1) = \mathbb{E}_{\pi_\theta}[v_1]$$</li>
+
+<li>Given a contiuous environment: use average value: $$J_{avV}(\theta) = \sum_{s} d^{\pi\theta}(s)V^{\pi_\theta}(s)$$</li>
+
+<li>Or average reward per time step: $$J_{avR}(\theta) = \sum_{s} d^{\pi\theta}(s)R^{a}_{s}$$</li>
+
+</ul>
+
+<p>where $d^{\pi_\theta}(s)$ is the stationary distribution of the Markov chain for $\pi_\theta$.</p>
+
+</div>
+</div><!-- end of jb-output jb-render -->
+</div><!-- end of jb-output-code jb-render -->
+
+
+</div>
+<!-- Footer -->
+
+<div class="jb-footer-left plain">
+    <span id="id-3ec9cb30-ed23-43c3-a861-6cd892fb3116" ><span id="id-3ec9cb30-ed23-43c3-a861-6cd892fb3116"><img id="img-id-3ec9cb30-ed23-43c3-a861-6cd892fb3116"     src="assets/images/logo.png"/></span>
+</span>
+
+</div>
+<div class="jb-footer-right plain">
+    <span id="id-70a32868-731e-45ff-b22b-5e0d82756177" ><span id="id-70a32868-731e-45ff-b22b-5e0d82756177"><img id="img-id-70a32868-731e-45ff-b22b-5e0d82756177" width="162" height="138"   src="assets/images/robbi.png"/></span>
+</span>
+
+</div>
+
+<aside class="notes">
+
+</aside>
+
+
+
+</section>
+<section id="slide_00014_frag_00001" data-state="slide_00014_frag_00001">
+
+
+<!-- Header -->
+  
+
+<!-- Background -->
+
+
+<!-- Slide -->
+<div class="jb-slide">
+
+<div class="jb-output-code jb-render">
+
+<!-- start embedded style -->
+
+<!-- end embedded style -->
+<div class="jb-output jb-render">
+
+<h1>Policy Objective Function</h1>
+
+<div class="jb-text">
+<p>Given policy \(\pi_\theta(s,a)\) with parameters \(\theta\), find best \(\theta\)</p>
+
+<p>Evaluate policy \(\pi_{\theta}\)</p>
+
+<ul>
+<li>Given an entire episode: $$J_{1}(\theta) = V^{\pi_{\theta}}(s_1) = \mathbb{E}_{\pi_\theta}[v_1]$$</li>
+
+<li>Given a contiuous environment: use average value: $$J_{avV}(\theta) = \sum_{s} d^{\pi\theta}(s)V^{\pi_\theta}(s)$$</li>
+
+<li>Or average reward per time step: $$J_{avR}(\theta) = \sum_{s} d^{\pi\theta}(s)R^{a}_{s}$$</li>
+
+</ul>
+
+<p>where $d^{\pi_\theta}(s)$ is the stationary distribution of the Markov chain for $\pi_\theta$.</p>
+
+</div>
+</div><!-- end of jb-output jb-render -->
+</div><!-- end of jb-output-code jb-render -->
+
+
+</div>
+<!-- Footer -->
+
+<div class="jb-footer-left plain">
+    <span id="id-f1521fd8-3326-4f87-83b8-d15b208570b5" ><span id="id-f1521fd8-3326-4f87-83b8-d15b208570b5"><img id="img-id-f1521fd8-3326-4f87-83b8-d15b208570b5"     src="assets/images/logo.png"/></span>
+</span>
+
+</div>
+<div class="jb-footer-right plain">
+    <span id="id-2c9b4b12-f713-446c-999f-52a5717270ee" ><span id="id-2c9b4b12-f713-446c-999f-52a5717270ee"><img id="img-id-2c9b4b12-f713-446c-999f-52a5717270ee" width="162" height="138"   src="assets/images/robbi.png"/></span>
+</span>
+
+</div>
+
+<aside class="notes">
+
+</aside>
+
+
+
+</section>
+<section id="slide_00015_frag_00001" data-state="slide_00015_frag_00001">
+
+
+<!-- Header -->
+  
+
+<!-- Background -->
+
+
+<!-- Slide -->
+<div class="jb-slide">
+
+<div class="jb-output-code jb-render">
+
+<!-- start embedded style -->
+
+<!-- end embedded style -->
+<div class="jb-output jb-render">
+
+<h1>Policy Objective Function</h1>
+
+<div class="jb-text">
+<p>Given policy \(\pi_\theta(s,a)\) with parameters \(\theta\), find best \(\theta\)</p>
+
+<p>Evaluate policy \(\pi_{\theta}\)</p>
+
+<ul>
+<li>Given an entire episode: $$J_{1}(\theta) = V^{\pi_{\theta}}(s_1) = \mathbb{E}_{\pi_\theta}[v_1]$$</li>
+
+<li>Given a contiuous environment: use average value: $$J_{avV}(\theta) = \sum_{s} d^{\pi\theta}(s)V^{\pi_\theta}(s)$$</li>
+
+<li>Or average reward per time step: $$J_{avR}(\theta) = \sum_{s} d^{\pi\theta}(s)R^{a}_{s}$$</li>
+
+</ul>
+
+<p>where \(d^{\pi_\theta}(s)\) is the stationary distribution of the Markov chain for \(\pi_\theta\).</p>
+
+</div>
+</div><!-- end of jb-output jb-render -->
+</div><!-- end of jb-output-code jb-render -->
+
+
+</div>
+<!-- Footer -->
+
+<div class="jb-footer-left plain">
+    <span id="id-0ad483ec-6789-434e-b48c-897bb76d35b0" ><span id="id-0ad483ec-6789-434e-b48c-897bb76d35b0"><img id="img-id-0ad483ec-6789-434e-b48c-897bb76d35b0"     src="assets/images/logo.png"/></span>
+</span>
+
+</div>
+<div class="jb-footer-right plain">
+    <span id="id-3192ec51-e6f2-4b2f-8d5b-db81daac0b9f" ><span id="id-3192ec51-e6f2-4b2f-8d5b-db81daac0b9f"><img id="img-id-3192ec51-e6f2-4b2f-8d5b-db81daac0b9f" width="162" height="138"   src="assets/images/robbi.png"/></span>
+</span>
+
+</div>
+
+<aside class="notes">
+
+</aside>
+
+
+
+</section>
+<section id="slide_00016_frag_00001" data-state="slide_00016_frag_00001">
+
+
+<!-- Header -->
+  
+
+<!-- Background -->
+
+
+<!-- Slide -->
+<div class="jb-slide">
+
+<div class="jb-output-code jb-render">
+
+<!-- start embedded style -->
+
+<!-- end embedded style -->
+<div class="jb-output jb-render">
+
+<h1>Evaluation of Policy</h1>
+
+<div class="jb-text">
+<p>The policy evaluation may be noisy as in this example</p>
+
+<p>The blue line is the reward for each episode, the red line is the average reward per episode</p>
+
+<div class="jb-img" style="text-align:center;">
+    <span id="id-5a3b9a6b-189d-4845-aadc-dc33529edfbc" ><span id="id-5a3b9a6b-189d-4845-aadc-dc33529edfbc"><img id="img-id-5a3b9a6b-189d-4845-aadc-dc33529edfbc"     src="assets/images/figvar.svg"/></span>
+</span>
+
+</div>
+
+<p>You can see the large swings in the blue line, which makes learning difficult.</p>
+
+<p>However, in this case, the red line converges quickly</p>
+</div>
+</div><!-- end of jb-output jb-render -->
+</div><!-- end of jb-output-code jb-render -->
+
+
+</div>
+<!-- Footer -->
+
+<div class="jb-footer-left plain">
+    <span id="id-0df6bcef-75cb-4be0-94eb-3985b68ba576" ><span id="id-0df6bcef-75cb-4be0-94eb-3985b68ba576"><img id="img-id-0df6bcef-75cb-4be0-94eb-3985b68ba576"     src="assets/images/logo.png"/></span>
+</span>
+
+</div>
+<div class="jb-footer-right plain">
+    <span id="id-682fda88-884d-4cf7-bfc0-2af7f1da99b0" ><span id="id-682fda88-884d-4cf7-bfc0-2af7f1da99b0"><img id="img-id-682fda88-884d-4cf7-bfc0-2af7f1da99b0" width="162" height="138"   src="assets/images/robbi.png"/></span>
+</span>
+
+</div>
+
+<aside class="notes">
+
+</aside>
+
+
+
+</section>
+<section id="slide_00017_frag_00001" data-state="slide_00017_frag_00001">
+
+
+<!-- Header -->
+  
+
+<!-- Background -->
+
+
+<!-- Slide -->
+<div class="jb-slide">
+
+<div class="jb-output-code jb-render">
+
+<!-- start embedded style -->
+
+<!-- end embedded style -->
+<div class="jb-output jb-render">
+<div class="document">
+<div class="jb-text docutils container">
+<p>Policy-based reinforcement learning is an optimisation problem</p>
+<p>Find $\theta$ that maximizes $J(\theta)$</p>
+<p>Some approaches do not use gradient</p>
+<ul class="simple">
+<li>Hill climbing</li>
+<li>Simplex/amoeba/Nelder Mead</li>
+<li>Genetic algorithms</li>
+</ul>
+<p>Usually more efficient when using gradient</p>
+<ul class="simple">
+<li>Gradient descent</li>
+<li>Conjugate gradient</li>
+<li>Quasi-Newton method</li>
+</ul>
+<p>Most popular one is gradient descent with extensions for sequential structure of problem</p>
+</div>
+</div>
+
+</div><!-- end of jb-output jb-render -->
+</div><!-- end of jb-output-code jb-render -->
+
+
+</div>
+<!-- Footer -->
+
+<div class="jb-footer-left plain">
+    <span id="id-fc7a1f1f-b1de-4676-a25d-fd81a96a5ed9" ><span id="id-fc7a1f1f-b1de-4676-a25d-fd81a96a5ed9"><img id="img-id-fc7a1f1f-b1de-4676-a25d-fd81a96a5ed9"     src="assets/images/logo.png"/></span>
+</span>
+
+</div>
+<div class="jb-footer-right plain">
+    <span id="id-e51e6713-f341-4436-a8cf-32f79b7ad59e" ><span id="id-e51e6713-f341-4436-a8cf-32f79b7ad59e"><img id="img-id-e51e6713-f341-4436-a8cf-32f79b7ad59e" width="162" height="138"   src="assets/images/robbi.png"/></span>
+</span>
+
+</div>
+
+<aside class="notes">
+
+</aside>
+
+
+
+</section>
+<section id="slide_00018_frag_00001" data-state="slide_00018_frag_00001">
+
+
+<!-- Header -->
+  
+
+<!-- Background -->
+
+
+<!-- Slide -->
+<div class="jb-slide">
+
+<div class="jb-output-code jb-render">
+
+<!-- start embedded style -->
+
+<!-- end embedded style -->
+<div class="jb-output jb-render">
+<div class="document" id="finite-differences-method">
+<h1 class="title">Finite Differences Method</h1>
+<div class="jb-text docutils container">
+<p>Policy gradient $\nabla_{\theta} \pi_{\theta}(s,a)$ is defined as partial derivative of $J(theta)$ for each parameter $\theta_i$</p>
+<p>By changing each $\theta_i$ a little bit, we can estimate the gradient.
+[\frac{J(\delta \theta)}{\delta \theta_k} \approx \frac{J(\theta + \epsilon u_k) - J(\theta)}{\epsilon}]
+where $u_k$ is a unit vector with 1 in $k$-th component and 0 elsewhere</p>
+<p>Requires $n$ evaluations for a policy $\pi_\theta$ with $n$ parameters $\theta_0, \theta_1, ... \theta_n$</p>
+<p>Simple, inefficient, and susceptible to noise</p>
+<p>Works for any policy, even if the policy is not differentiable</p>
+</div>
+</div>
+
+</div><!-- end of jb-output jb-render -->
+</div><!-- end of jb-output-code jb-render -->
+
+
+</div>
+<!-- Footer -->
+
+<div class="jb-footer-left plain">
+    <span id="id-4aabfaac-83d3-4edc-b861-fd953b66ddd8" ><span id="id-4aabfaac-83d3-4edc-b861-fd953b66ddd8"><img id="img-id-4aabfaac-83d3-4edc-b861-fd953b66ddd8"     src="assets/images/logo.png"/></span>
+</span>
+
+</div>
+<div class="jb-footer-right plain">
+    <span id="id-af83efcd-bb95-49ef-8b3e-d20e17f6934a" ><span id="id-af83efcd-bb95-49ef-8b3e-d20e17f6934a"><img id="img-id-af83efcd-bb95-49ef-8b3e-d20e17f6934a" width="162" height="138"   src="assets/images/robbi.png"/></span>
+</span>
+
+</div>
+
+<aside class="notes">
+
+label slide_00018_frag_00001:
+
+
+JB: Hello. So how do we calculate the gradient?
+
+
+C: Hm. Actually - Prof - what is a gradient. Could you remind me?
+
+
+# Lyrebird
+</aside>
+
+
+
+</section>
+<section id="slide_00019_frag_00001" data-state="slide_00019_frag_00001">
+
+
+<!-- Header -->
+  
+
+<!-- Background -->
+
+
+<!-- Slide -->
+<div class="jb-slide">
+
+<div class="jb-output-code jb-render">
+
+<!-- start embedded style -->
+
+<!-- end embedded style -->
+<div class="jb-output jb-render">
+<div class="document" id="analytical-solution">
+<h1 class="title">Analytical Solution</h1>
+<div class="jb-text docutils container">
+<p>Calculate the policy gradient $\nabla_{\theta} \pi_{\theta}(s,a)$ analytically may lead to better convergence</p>
+<p><strong>Likelihood ratios</strong></p>
+<p>$$
+\begin{equation}
+\nabla_{\theta} \pi_{\theta}(s,a) = \pi_{\theta}(s,a) \frac{\nabla_{\theta} \pi_{\theta}(s,a)}{\pi_{\theta}(s,a)}\\
+\ \ \ \ \ \ \ \ = \pi_{\theta}(s,a) \nabla_{\theta} \log \pi_{\theta}(s,a)
+\end{equation}
+$$</p>
+<p><strong>Score function</strong>
+$$
+\nabla_{\theta} \log \pi_{\theta}(s,a)
+$$</p>
+</div>
+</div>
+
+</div><!-- end of jb-output jb-render -->
+</div><!-- end of jb-output-code jb-render -->
+
+
+</div>
+<!-- Footer -->
+
+<div class="jb-footer-left plain">
+    <span id="id-75da9fb2-1d02-4719-9d31-2c978a8bd6e4" ><span id="id-75da9fb2-1d02-4719-9d31-2c978a8bd6e4"><img id="img-id-75da9fb2-1d02-4719-9d31-2c978a8bd6e4"     src="assets/images/logo.png"/></span>
+</span>
+
+</div>
+<div class="jb-footer-right plain">
+    <span id="id-56ce2dee-042e-40ff-bba2-4ac0ec7d9f38" ><span id="id-56ce2dee-042e-40ff-bba2-4ac0ec7d9f38"><img id="img-id-56ce2dee-042e-40ff-bba2-4ac0ec7d9f38" width="162" height="138"   src="assets/images/robbi.png"/></span>
+</span>
+
+</div>
+
+<aside class="notes">
+
+</aside>
+
+
+
+</section>
+<section id="slide_00020_frag_00001" data-state="slide_00020_frag_00001">
+
+
+<!-- Header -->
+  
+
+<!-- Background -->
+
+
+<!-- Slide -->
+<div class="jb-slide">
+
+<div class="jb-output-code jb-render">
+
+<!-- start embedded style -->
+
+<!-- end embedded style -->
+<div class="jb-output jb-render">
+<div class="document" id="analytical-solution">
+<h1 class="title">Analytical Solution</h1>
+<div class="jb-text docutils container">
+<p>Calculate the policy gradient (nabla_{\theta} \pi_{\theta}(s,a)) analytically may lead to better convergence</p>
+<p><strong>Likelihood ratios</strong></p>
+<p>$$
+\begin{equation}
+\nabla_{\theta} \pi_{\theta}(s,a) = \pi_{\theta}(s,a) \frac{\nabla_{\theta} \pi_{\theta}(s,a)}{\pi_{\theta}(s,a)}\\
+\ \ \ \ \ \ \ \ = \pi_{\theta}(s,a) \nabla_{\theta} \log \pi_{\theta}(s,a)
+\end{equation}
+$$</p>
+<p><strong>Score function</strong>
+$$
+\nabla_{\theta} \log \pi_{\theta}(s,a)
+$$</p>
+</div>
+</div>
+
+</div><!-- end of jb-output jb-render -->
+</div><!-- end of jb-output-code jb-render -->
+
+
+</div>
+<!-- Footer -->
+
+<div class="jb-footer-left plain">
+    <span id="id-f37eee7c-3627-4f13-bfba-e52124c3f87d" ><span id="id-f37eee7c-3627-4f13-bfba-e52124c3f87d"><img id="img-id-f37eee7c-3627-4f13-bfba-e52124c3f87d"     src="assets/images/logo.png"/></span>
+</span>
+
+</div>
+<div class="jb-footer-right plain">
+    <span id="id-d2455076-2975-4080-b10a-422da63395fa" ><span id="id-d2455076-2975-4080-b10a-422da63395fa"><img id="img-id-d2455076-2975-4080-b10a-422da63395fa" width="162" height="138"   src="assets/images/robbi.png"/></span>
+</span>
+
+</div>
+
+<aside class="notes">
+
+</aside>
+
+
+
+</section>
+<section id="slide_00021_frag_00001" data-state="slide_00021_frag_00001">
+
+
+<!-- Header -->
+  
+
+<!-- Background -->
+
+
+<!-- Slide -->
+<div class="jb-slide">
+
+<div class="jb-output-code jb-render">
+
+<!-- start embedded style -->
+
+<!-- end embedded style -->
+<div class="jb-output jb-render">
+<div class="document" id="analytical-solution">
+<h1 class="title">Analytical Solution</h1>
+<div class="jb-text docutils container">
+<p>Calculate the policy gradient (nabla_{theta} pi_{theta}(s,a)) analytically may lead to better convergence</p>
+<p><strong>Likelihood ratios</strong></p>
+<p>$$
+\begin{equation}
+\nabla_{\theta} \pi_{\theta}(s,a) = \pi_{\theta}(s,a) \frac{\nabla_{\theta} \pi_{\theta}(s,a)}{\pi_{\theta}(s,a)}\\
+\ \ \ \ \ \ \ \ = \pi_{\theta}(s,a) \nabla_{\theta} \log \pi_{\theta}(s,a)
+\end{equation}
+$$</p>
+<p><strong>Score function</strong>
+$$
+\nabla_{\theta} \log \pi_{\theta}(s,a)
+$$</p>
+</div>
+</div>
+
+</div><!-- end of jb-output jb-render -->
+</div><!-- end of jb-output-code jb-render -->
+
+
+</div>
+<!-- Footer -->
+
+<div class="jb-footer-left plain">
+    <span id="id-575232a4-9054-4e9c-9bbf-9859d7a109e8" ><span id="id-575232a4-9054-4e9c-9bbf-9859d7a109e8"><img id="img-id-575232a4-9054-4e9c-9bbf-9859d7a109e8"     src="assets/images/logo.png"/></span>
+</span>
+
+</div>
+<div class="jb-footer-right plain">
+    <span id="id-8265b322-8d37-4547-b7c6-ad09dcfef71d" ><span id="id-8265b322-8d37-4547-b7c6-ad09dcfef71d"><img id="img-id-8265b322-8d37-4547-b7c6-ad09dcfef71d" width="162" height="138"   src="assets/images/robbi.png"/></span>
+</span>
+
+</div>
+
+<aside class="notes">
+
+</aside>
+
+
+
+</section>
+<section id="slide_00022_frag_00001" data-state="slide_00022_frag_00001">
+
+
+<!-- Header -->
+  
+
+<!-- Background -->
+
+
+<!-- Slide -->
+<div class="jb-slide">
+
+<div class="jb-output-code jb-render">
+
+<!-- start embedded style -->
+
+<!-- end embedded style -->
+<div class="jb-output jb-render">
+<div class="document" id="analytical-solution">
+<h1 class="title">Analytical Solution</h1>
+<div class="jb-text docutils container">
+<p>Calculate the policy gradient ({theta} pi_{theta}(s,a)) analytically may lead to better convergence</p>
+<p><strong>Likelihood ratios</strong></p>
+<p>$$
+\begin{equation}
+\nabla_{\theta} \pi_{\theta}(s,a) = \pi_{\theta}(s,a) \frac{\nabla_{\theta} \pi_{\theta}(s,a)}{\pi_{\theta}(s,a)}\\
+\ \ \ \ \ \ \ \ = \pi_{\theta}(s,a) \nabla_{\theta} \log \pi_{\theta}(s,a)
+\end{equation}
+$$</p>
+<p><strong>Score function</strong>
+$$
+\nabla_{\theta} \log \pi_{\theta}(s,a)
+$$</p>
+</div>
+</div>
+
+</div><!-- end of jb-output jb-render -->
+</div><!-- end of jb-output-code jb-render -->
+
+
+</div>
+<!-- Footer -->
+
+<div class="jb-footer-left plain">
+    <span id="id-fdc34f36-f42a-4914-beb4-49999da9daf0" ><span id="id-fdc34f36-f42a-4914-beb4-49999da9daf0"><img id="img-id-fdc34f36-f42a-4914-beb4-49999da9daf0"     src="assets/images/logo.png"/></span>
+</span>
+
+</div>
+<div class="jb-footer-right plain">
+    <span id="id-e0a3df85-6e61-4618-8b40-69fd611a468f" ><span id="id-e0a3df85-6e61-4618-8b40-69fd611a468f"><img id="img-id-e0a3df85-6e61-4618-8b40-69fd611a468f" width="162" height="138"   src="assets/images/robbi.png"/></span>
+</span>
+
+</div>
+
+<aside class="notes">
+
+</aside>
+
+
+
+</section>
+<section id="slide_00023_frag_00001" data-state="slide_00023_frag_00001">
+
+
+<!-- Header -->
+  
+
+<!-- Background -->
+
+
+<!-- Slide -->
+<div class="jb-slide">
+
+<div class="jb-output-code jb-render">
+
+<!-- start embedded style -->
+
+<!-- end embedded style -->
+<div class="jb-output jb-render">
+
+<h1>Analytical Solution</h1>
+
+<div class="jb-text">
+<ul>
+<li>
+    Calculate the policy gradient \(\nabla_{\theta} \pi_{\theta}(s,a)\) analytically may lead to better convergence
+</li>
+
+<li>
+    Likelihood ratios
+</li>
+<ul>
+<li>
+    \[
+      \\begin{equation}
+    \\nabla_{\\theta} \\pi_{\\theta}(s,a) = \\pi_{\\theta}(s,a) \\frac{\\nabla_{\\theta} \\pi_{\\theta}(s,a)}{\\pi_{\\theta}(s,a)}\\\\
+    \\ \\ \\ \\ \\ \\ \\ \\ = \\pi_{\\theta}(s,a) \\nabla_{\\theta} \\log \\pi_{\\theta}(s,a)
+    \\end{equation}
+    \]
+</li>
+<li>
+    Score function
+</li>
+<ul>
+<li>
+    \[
+    \nabla_{\theta} \log \pi_{\theta}(s,a)
+    \]
+</div>
+</div><!-- end of jb-output jb-render -->
+</div><!-- end of jb-output-code jb-render -->
+
+
+</div>
+<!-- Footer -->
+
+<div class="jb-footer-left plain">
+    <span id="id-5a47608d-b9ec-4b31-b25b-6ba2c19199e3" ><span id="id-5a47608d-b9ec-4b31-b25b-6ba2c19199e3"><img id="img-id-5a47608d-b9ec-4b31-b25b-6ba2c19199e3"     src="assets/images/logo.png"/></span>
+</span>
+
+</div>
+<div class="jb-footer-right plain">
+    <span id="id-d5eb13d5-cd0a-4265-bcda-dfc1c707a69e" ><span id="id-d5eb13d5-cd0a-4265-bcda-dfc1c707a69e"><img id="img-id-d5eb13d5-cd0a-4265-bcda-dfc1c707a69e" width="162" height="138"   src="assets/images/robbi.png"/></span>
+</span>
+
+</div>
+
+<aside class="notes">
+
+</aside>
+
+
+
+</section>
+<section id="slide_00024_frag_00001" data-state="slide_00024_frag_00001">
+
+
+<!-- Header -->
+  
+
+<!-- Background -->
+
+
+<!-- Slide -->
+<div class="jb-slide">
+
+<div class="jb-output-code jb-render">
+
+<!-- start embedded style -->
+
+<!-- end embedded style -->
+<div class="jb-output jb-render">
+
+<h1>Analytical Solution</h1>
+
+<div class="jb-text">
+<ul>
+<li>
+    Calculate the policy gradient analytically may lead to better convergence
+</li>
+
+<li>
+    Likelihood ratios
+</li>
+<ul>
+<li>
+    \[
+      \\begin{equation}
+    \\nabla_{\\theta} \\pi_{\\theta}(s,a) = \\pi_{\\theta}(s,a) \\frac{\\nabla_{\\theta} \\pi_{\\theta}(s,a)}{\\pi_{\\theta}(s,a)}\\\\
+    \\ \\ \\ \\ \\ \\ \\ \\ = \\pi_{\\theta}(s,a) \\nabla_{\\theta} \\log \\pi_{\\theta}(s,a)
+    \\end{equation}
+    \]
+</li>
+<li>
+    Score function
+</li>
+<ul>
+<li>
+    \[
+    \nabla_{\theta} \log \pi_{\theta}(s,a)
+    \]
+</div>
+</div><!-- end of jb-output jb-render -->
+</div><!-- end of jb-output-code jb-render -->
+
+
+</div>
+<!-- Footer -->
+
+<div class="jb-footer-left plain">
+    <span id="id-c46d05ff-e669-4d4a-97fc-1a1c66e38644" ><span id="id-c46d05ff-e669-4d4a-97fc-1a1c66e38644"><img id="img-id-c46d05ff-e669-4d4a-97fc-1a1c66e38644"     src="assets/images/logo.png"/></span>
+</span>
+
+</div>
+<div class="jb-footer-right plain">
+    <span id="id-6911caa1-64b7-4f92-b68b-de1e1c8817d5" ><span id="id-6911caa1-64b7-4f92-b68b-de1e1c8817d5"><img id="img-id-6911caa1-64b7-4f92-b68b-de1e1c8817d5" width="162" height="138"   src="assets/images/robbi.png"/></span>
+</span>
+
+</div>
+
+<aside class="notes">
+
+</aside>
+
+
+
+</section>
+<section id="slide_00025_frag_00001" data-state="slide_00025_frag_00001">
+
+
+<!-- Header -->
+  
+
+<!-- Background -->
+
+
+<!-- Slide -->
+<div class="jb-slide">
+
+<div class="jb-output-code jb-render">
+
+<!-- start embedded style -->
+
+<!-- end embedded style -->
+<div class="jb-output jb-render">
+
+<h1>Analytical Solution</h1>
+
+<div class="jb-text">
+<ul>
+<li>
+    Calculate the policy gradient \(\nabla_{\theta} \pi_{\theta}(s,a)\) analytically may lead to better convergence
+</li>
+
+<li>
+    Likelihood ratios
+</li>
+<ul>
+<li>
+    \[
+      \\begin{equation}
+    \\nabla_{\\theta} \\pi_{\\theta}(s,a) = \\pi_{\\theta}(s,a) \\frac{\\nabla_{\\theta} \\pi_{\\theta}(s,a)}{\\pi_{\\theta}(s,a)}\\\\
+    \\ \\ \\ \\ \\ \\ \\ \\ = \\pi_{\\theta}(s,a) \\nabla_{\\theta} \\log \\pi_{\\theta}(s,a)
+    \\end{equation}
+    \]
+</li>
+<li>
+    Score function
+</li>
+<ul>
+<li>
+    \[
+    \nabla_{\theta} \log \pi_{\theta}(s,a)
+    \]
+</div>
+</div><!-- end of jb-output jb-render -->
+</div><!-- end of jb-output-code jb-render -->
+
+
+</div>
+<!-- Footer -->
+
+<div class="jb-footer-left plain">
+    <span id="id-9d7dc429-6456-4044-8187-e2a7c545cb9a" ><span id="id-9d7dc429-6456-4044-8187-e2a7c545cb9a"><img id="img-id-9d7dc429-6456-4044-8187-e2a7c545cb9a"     src="assets/images/logo.png"/></span>
+</span>
+
+</div>
+<div class="jb-footer-right plain">
+    <span id="id-0378b3b4-ff78-4dfb-89bc-1b554c1911f9" ><span id="id-0378b3b4-ff78-4dfb-89bc-1b554c1911f9"><img id="img-id-0378b3b4-ff78-4dfb-89bc-1b554c1911f9" width="162" height="138"   src="assets/images/robbi.png"/></span>
+</span>
+
+</div>
+
+<aside class="notes">
+
+</aside>
+
+
+
+</section>
+<section id="slide_00026_frag_00001" data-state="slide_00026_frag_00001">
+
+
+<!-- Header -->
+  
+
+<!-- Background -->
+
+
+<!-- Slide -->
+<div class="jb-slide">
+
+<div class="jb-output-code jb-render">
+
+<!-- start embedded style -->
+
+<!-- end embedded style -->
+<div class="jb-output jb-render">
+
+<h1>Analytical Solution</h1>
+
+<div class="jb-text">
+<ul>
+<li>
+    Calculate the policy gradient \(\nabla_{\theta} \pi_{\theta}(s,a)\) analytically may lead to better convergence
+</li>
+
+<li>
+    Likelihood ratios
+</li>
+<ul>
+<li>
+    \[
+      \begin{equation}
+    \nabla_{\theta} \pi_{\theta}(s,a) = \pi_{\theta}(s,a) \frac{\nabla_{\theta} \pi_{\theta}(s,a)}{\pi_{\theta}(s,a)}\\\\
+    \ \ \ \ \ \ \ \ = \pi_{\theta}(s,a) \nabla_{\theta} \log \pi_{\theta}(s,a)
+    \end{equation}
+    \]
+</li>
+<li>
+    Score function
+</li>
+<ul>
+<li>
+    \[
+    \nabla_{\theta} \log \pi_{\theta}(s,a)
+    \]
+</div>
+</div><!-- end of jb-output jb-render -->
+</div><!-- end of jb-output-code jb-render -->
+
+
+</div>
+<!-- Footer -->
+
+<div class="jb-footer-left plain">
+    <span id="id-145162f1-947c-4b47-9223-dcf74c55b4e6" ><span id="id-145162f1-947c-4b47-9223-dcf74c55b4e6"><img id="img-id-145162f1-947c-4b47-9223-dcf74c55b4e6"     src="assets/images/logo.png"/></span>
+</span>
+
+</div>
+<div class="jb-footer-right plain">
+    <span id="id-6b6a9a60-076c-40d5-8c3b-6aaab8097e80" ><span id="id-6b6a9a60-076c-40d5-8c3b-6aaab8097e80"><img id="img-id-6b6a9a60-076c-40d5-8c3b-6aaab8097e80" width="162" height="138"   src="assets/images/robbi.png"/></span>
+</span>
+
+</div>
+
+<aside class="notes">
+
+</aside>
+
+
+
+</section>
+<section id="slide_00027_frag_00001" data-state="slide_00027_frag_00001">
+
+
+<!-- Header -->
+  
+
+<!-- Background -->
+
+
+<!-- Slide -->
+<div class="jb-slide">
+
+<div class="jb-output-code jb-render">
+
+<!-- start embedded style -->
+
+<!-- end embedded style -->
+<div class="jb-output jb-render">
+
+<h1>Analytical Solution</h1>
+
+<div class="jb-text">
+<ul>
+<li>
+    Calculate the policy gradient \(\nabla_{\theta} \pi_{\theta}(s,a)\) analytically may lead to better convergence
+</li>
+
+<li>
+    Likelihood ratios
+</li>
+<ul>
+<li>
+    \[
+      \begin{equation}
+    \nabla_{\theta} \pi_{\theta}(s,a) = \pi_{\theta}(s,a) \frac{\nabla_{\theta} \pi_{\theta}(s,a)}{\pi_{\theta}(s,a)}\\\\
+    \ \ \ \ \ \ \ \ = \pi_{\theta}(s,a) \nabla_{\theta} \log \pi_{\theta}(s,a)
+    \end{equation}
+    \]
+</li>
+<li>
+    Score function
+</li>
+<ul>
+<li>
+    \[
+    \nabla_{\theta} \log \pi_{\theta}(s,a)
+    \]
+</li>
+</ul>
+</ul>
+</div>
+</div><!-- end of jb-output jb-render -->
+</div><!-- end of jb-output-code jb-render -->
+
+
+</div>
+<!-- Footer -->
+
+<div class="jb-footer-left plain">
+    <span id="id-121ab70e-07ee-4cf4-9d6f-71e983923fdf" ><span id="id-121ab70e-07ee-4cf4-9d6f-71e983923fdf"><img id="img-id-121ab70e-07ee-4cf4-9d6f-71e983923fdf"     src="assets/images/logo.png"/></span>
+</span>
+
+</div>
+<div class="jb-footer-right plain">
+    <span id="id-547cf347-6076-40ea-a9d4-c0cd89c87006" ><span id="id-547cf347-6076-40ea-a9d4-c0cd89c87006"><img id="img-id-547cf347-6076-40ea-a9d4-c0cd89c87006" width="162" height="138"   src="assets/images/robbi.png"/></span>
+</span>
+
+</div>
+
+<aside class="notes">
+
+</aside>
+
+
+
+</section>
+<section id="slide_00028_frag_00001" data-state="slide_00028_frag_00001">
+
+
+<!-- Header -->
+  
+
+<!-- Background -->
+
+
+<!-- Slide -->
+<div class="jb-slide">
+
+<div class="jb-output-code jb-render">
+
+<!-- start embedded style -->
+
+<!-- end embedded style -->
+<div class="jb-output jb-render">
+<div class="document" id="monte-carlo-policy-gradient-reinforce">
+<h1 class="title">Monte-Carlo Policy Gradient (REINFORCE)</h1>
+<div class="jb-text docutils container">
+<pre class="code python literal-block">
+<span class="keyword">def</span> <span class="name function">REINFORCE</span><span class="punctuation">(</span> <span class="name">alpha</span><span class="punctuation">,</span> <span class="name">traces</span> <span class="punctuation">):</span>
+    <span class="name">theta</span> <span class="operator">=</span> <span class="name">np</span><span class="operator">.</span><span class="name">zeros</span><span class="punctuation">((</span><span class="name builtin">len</span><span class="punctuation">(</span><span class="name">model</span><span class="punctuation">)))</span>
+    <span class="keyword">for</span> <span class="name">t</span> <span class="operator word">in</span> <span class="name">trace</span><span class="punctuation">:</span>
+        <span class="keyword">for</span> <span class="name">step</span> <span class="operator word">in</span> <span class="name">t</span><span class="punctuation">:</span>
+            <span class="name">st</span><span class="punctuation">,</span><span class="name">at</span><span class="punctuation">,</span> <span class="name">vt</span> <span class="operator">=</span> <span class="name">step</span>
+            <span class="name">dtheta</span> <span class="operator">=</span> <span class="name">dtheta</span> <span class="operator">+</span> <span class="name">alpha</span> <span class="operator">*</span> <span class="name">grad</span> <span class="operator">*</span> <span class="name">math</span><span class="operator">.</span><span class="name">log</span><span class="punctuation">(</span> <span class="name">p</span><span class="punctuation">(</span><span class="name">st</span><span class="punctuation">,</span><span class="name">at</span><span class="punctuation">)</span> <span class="punctuation">)</span><span class="operator">*</span> <span class="name">vt</span>
+    <span class="name">theta</span> <span class="operator">=</span> <span class="name">theta</span> <span class="operator">+</span> <span class="name">dtheta</span>
+    <span class="keyword">return</span> <span class="name">theta</span>
+</pre>
+</div>
+</div>
+
+</div><!-- end of jb-output jb-render -->
+</div><!-- end of jb-output-code jb-render -->
+
+
+</div>
+<!-- Footer -->
+
+<div class="jb-footer-left plain">
+    <span id="id-8f867262-074f-4192-ac8d-088d87841b3d" ><span id="id-8f867262-074f-4192-ac8d-088d87841b3d"><img id="img-id-8f867262-074f-4192-ac8d-088d87841b3d"     src="assets/images/logo.png"/></span>
+</span>
+
+</div>
+<div class="jb-footer-right plain">
+    <span id="id-9e0aca06-c202-4601-af7c-fe98b80b53a8" ><span id="id-9e0aca06-c202-4601-af7c-fe98b80b53a8"><img id="img-id-9e0aca06-c202-4601-af7c-fe98b80b53a8" width="162" height="138"   src="assets/images/robbi.png"/></span>
+</span>
+
+</div>
+
+<aside class="notes">
+
+</aside>
+
+
+
+</section>
+<section id="slide_00029_frag_00001" data-state="slide_00029_frag_00001">
+
+
+<!-- Header -->
+  
+
+<!-- Background -->
+
+
+<!-- Slide -->
+<div class="jb-slide">
+
+<div class="jb-output-code jb-render">
+
+<!-- start embedded style -->
+
+<!-- end embedded style -->
+<div class="jb-output jb-render">
+<div class="document" id="actor-critic-model">
+<h1 class="title">Actor-Critic Model</h1>
+<div class="jb-text docutils container">
+<p>Critic to estimate Q-values $Q_W(s,a) \approx Q^{\pi_\theta}(s,a)$</p>
+<blockquote>
+Reduce variance during training</blockquote>
+<p>Actor-Critic systems</p>
+<blockquote>
+<p>Critic - Updates estimates of Q-values parameters $w$</p>
+<p>Actor - Updates policy parameters $\theta$</p>
+</blockquote>
+<p>Follow approximate policy gradient</p>
+<blockquote>
+$$
+\nabla J(\theta) \approx \mathbb{E}[\nabla_\theta \log \pi_\theta Q_w(s,a)]\\
+\Delta \theta = \alpha \nabla_\theta \log \pi_\theta Q_w(s,a)
+$$</blockquote>
+</div>
+</div>
+
+</div><!-- end of jb-output jb-render -->
+</div><!-- end of jb-output-code jb-render -->
+
+
+</div>
+<!-- Footer -->
+
+<div class="jb-footer-left plain">
+    <span id="id-d5a878fc-18a9-4c46-a5a5-add944c149e9" ><span id="id-d5a878fc-18a9-4c46-a5a5-add944c149e9"><img id="img-id-d5a878fc-18a9-4c46-a5a5-add944c149e9"     src="assets/images/logo.png"/></span>
+</span>
+
+</div>
+<div class="jb-footer-right plain">
+    <span id="id-62fb3dfa-33e7-4099-8088-86fa8d899618" ><span id="id-62fb3dfa-33e7-4099-8088-86fa8d899618"><img id="img-id-62fb3dfa-33e7-4099-8088-86fa8d899618" width="162" height="138"   src="assets/images/robbi.png"/></span>
+</span>
+
+</div>
+
+<aside class="notes">
+
+</aside>
+
+
+
+</section>
+<section id="slide_00030_frag_00001" data-state="slide_00030_frag_00001">
+
+
+<!-- Header -->
+  
+
+<!-- Background -->
+
+
+<!-- Slide -->
+<div class="jb-slide">
+
+<div class="jb-output-code jb-render">
+
+<!-- start embedded style -->
+
+<!-- end embedded style -->
+<div class="jb-output jb-render">
+<div class="document" id="actor-critic-model">
+<h1 class="title">Actor-Critic Model</h1>
+<div class="jb-text docutils container">
+<p>Critic to estimate Q-values (Q_W(s,a) approx Q^{pi_theta}(s,a))</p>
+<blockquote>
+Reduce variance during training</blockquote>
+<p>Actor-Critic systems</p>
+<blockquote>
+<p>Critic - Updates estimates of Q-values parameters $w$</p>
+<p>Actor - Updates policy parameters $\theta$</p>
+</blockquote>
+<p>Follow approximate policy gradient</p>
+<blockquote>
+$$
+\nabla J(\theta) \approx \mathbb{E}[\nabla_\theta \log \pi_\theta Q_w(s,a)]\\
+\Delta \theta = \alpha \nabla_\theta \log \pi_\theta Q_w(s,a)
+$$</blockquote>
+</div>
+</div>
+
+</div><!-- end of jb-output jb-render -->
+</div><!-- end of jb-output-code jb-render -->
+
+
+</div>
+<!-- Footer -->
+
+<div class="jb-footer-left plain">
+    <span id="id-0f16c810-826e-48fa-b045-f74487efc6ec" ><span id="id-0f16c810-826e-48fa-b045-f74487efc6ec"><img id="img-id-0f16c810-826e-48fa-b045-f74487efc6ec"     src="assets/images/logo.png"/></span>
+</span>
+
+</div>
+<div class="jb-footer-right plain">
+    <span id="id-b6586b71-5e7b-4b3e-9c92-efdd46dc7c6c" ><span id="id-b6586b71-5e7b-4b3e-9c92-efdd46dc7c6c"><img id="img-id-b6586b71-5e7b-4b3e-9c92-efdd46dc7c6c" width="162" height="138"   src="assets/images/robbi.png"/></span>
+</span>
+
+</div>
+
+<aside class="notes">
+
+</aside>
+
+
+
+</section>
+<section id="slide_00031_frag_00001" data-state="slide_00031_frag_00001">
+
+
+<!-- Header -->
+  
+
+<!-- Background -->
+
+
+<!-- Slide -->
+<div class="jb-slide">
+
+<div class="jb-output-code jb-render">
+
+<!-- start embedded style -->
+
+<!-- end embedded style -->
+<div class="jb-output jb-render">
+<div class="document" id="actor-critic-model">
+<h1 class="title">Actor-Critic Model</h1>
+<div class="jb-text docutils container">
+<p>Critic to estimate Q-values (Q_W(s,a) approx Q^{pi_theta}(s,a))</p>
+<blockquote>
+Reduce variance during training</blockquote>
+<p>Actor-Critic systems</p>
+<blockquote>
+<p>Critic - Updates estimates of Q-values parameters (w)</p>
+<p>Actor - Updates policy parameters (theta)</p>
+</blockquote>
+<p>Follow approximate policy gradient</p>
+<blockquote>
+$$
+\nabla J(\theta) \approx \mathbb{E}[\nabla_\theta \log \pi_\theta Q_w(s,a)]\\
+\Delta \theta = \alpha \nabla_\theta \log \pi_\theta Q_w(s,a)
+$$</blockquote>
+</div>
+</div>
+
+</div><!-- end of jb-output jb-render -->
+</div><!-- end of jb-output-code jb-render -->
+
+
+</div>
+<!-- Footer -->
+
+<div class="jb-footer-left plain">
+    <span id="id-c0bec296-48a0-4206-82af-ff10726591c9" ><span id="id-c0bec296-48a0-4206-82af-ff10726591c9"><img id="img-id-c0bec296-48a0-4206-82af-ff10726591c9"     src="assets/images/logo.png"/></span>
+</span>
+
+</div>
+<div class="jb-footer-right plain">
+    <span id="id-4511a439-d84d-47a4-8eb8-6eb79e80dc99" ><span id="id-4511a439-d84d-47a4-8eb8-6eb79e80dc99"><img id="img-id-4511a439-d84d-47a4-8eb8-6eb79e80dc99" width="162" height="138"   src="assets/images/robbi.png"/></span>
+</span>
+
+</div>
+
+<aside class="notes">
+
+</aside>
+
+
+
+</section>
+<section id="slide_00032_frag_00001" data-state="slide_00032_frag_00001">
+
+
+<!-- Header -->
+  
+
+<!-- Background -->
+
+
+<!-- Slide -->
+<div class="jb-slide">
+
+<div class="jb-output-code jb-render">
+
+<!-- start embedded style -->
+
+<!-- end embedded style -->
+<div class="jb-output jb-render">
+<div class="document" id="actor-critic-model">
+<h1 class="title">Actor-Critic Model</h1>
+<div class="jb-text docutils container">
+<p>Critic to estimate Q-values $Q_W(s,a) approx Q^{pi_theta}(s,a)$</p>
+<blockquote>
+Reduce variance during training</blockquote>
+<p>Actor-Critic systems</p>
+<blockquote>
+<p>Critic - Updates estimates of Q-values parameters (w)</p>
+<p>Actor - Updates policy parameters (theta)</p>
+</blockquote>
+<p>Follow approximate policy gradient</p>
+<blockquote>
+$$
+\nabla J(\theta) \approx \mathbb{E}[\nabla_\theta \log \pi_\theta Q_w(s,a)]\\
+\Delta \theta = \alpha \nabla_\theta \log \pi_\theta Q_w(s,a)
+$$</blockquote>
+</div>
+</div>
+
+</div><!-- end of jb-output jb-render -->
+</div><!-- end of jb-output-code jb-render -->
+
+
+</div>
+<!-- Footer -->
+
+<div class="jb-footer-left plain">
+    <span id="id-f898a302-b1e8-42c8-a9b9-9f7764a1bde4" ><span id="id-f898a302-b1e8-42c8-a9b9-9f7764a1bde4"><img id="img-id-f898a302-b1e8-42c8-a9b9-9f7764a1bde4"     src="assets/images/logo.png"/></span>
+</span>
+
+</div>
+<div class="jb-footer-right plain">
+    <span id="id-4c1bcd54-3e5f-4c7d-bfbe-fb505019d0b2" ><span id="id-4c1bcd54-3e5f-4c7d-bfbe-fb505019d0b2"><img id="img-id-4c1bcd54-3e5f-4c7d-bfbe-fb505019d0b2" width="162" height="138"   src="assets/images/robbi.png"/></span>
+</span>
+
+</div>
+
+<aside class="notes">
+
+</aside>
+
+
+
+</section>
+<section id="slide_00033_frag_00001" data-state="slide_00033_frag_00001">
+
+
+<!-- Header -->
+  
+
+<!-- Background -->
+
+
+<!-- Slide -->
+<div class="jb-slide">
+
+<div class="jb-output-code jb-render">
+
+<!-- start embedded style -->
+
+<!-- end embedded style -->
+<div class="jb-output jb-render">
+
+<h1>Actor-Critic Model</h1>
+<div class="jb-text">
+<ul>
+<li>
+Critic to estimate Q-values $Q_W(s,a) \approx Q^{\pi_\theta}(s,a)$
+</li>
+<ul>
+        <li>Reduce variance during training</li>
+</ul>
+<li>
+    Actor-Critic systems
+</li>
+<ul>
+<li>
+        Critic - Updates estimates of Q-values parameters \(w\)
+</li>
+<li>
+        Actor - Updates policy parameters \(\theta\)
+</li>
+</ul>
+<li>
+    Follow approximate policy gradient
+</li>
+<ul>
+<li>
+        \[
+        \nabla J(\theta) \approx \mathbb{E}[\nabla_\theta \log \pi_\theta Q_w(s,a)] \\
+        \Delta \theta = \alpha \nabla_\theta \log \pi_\theta Q_w(s,a)
+        \]
+</li>
+</ul>
+</ul>
+</div>
+</div><!-- end of jb-output jb-render -->
+</div><!-- end of jb-output-code jb-render -->
+
+
+</div>
+<!-- Footer -->
+
+<div class="jb-footer-left plain">
+    <span id="id-0b6112db-5e75-4db6-9a26-adade6f87d46" ><span id="id-0b6112db-5e75-4db6-9a26-adade6f87d46"><img id="img-id-0b6112db-5e75-4db6-9a26-adade6f87d46"     src="assets/images/logo.png"/></span>
+</span>
+
+</div>
+<div class="jb-footer-right plain">
+    <span id="id-3daa5ada-8573-4e32-8926-88d1ee7b07ba" ><span id="id-3daa5ada-8573-4e32-8926-88d1ee7b07ba"><img id="img-id-3daa5ada-8573-4e32-8926-88d1ee7b07ba" width="162" height="138"   src="assets/images/robbi.png"/></span>
+</span>
+
+</div>
+
+<aside class="notes">
+
+</aside>
+
+
+
+</section>
+<section id="slide_00034_frag_00001" data-state="slide_00034_frag_00001">
+
+
+<!-- Header -->
+  
+
+<!-- Background -->
+
+
+<!-- Slide -->
+<div class="jb-slide">
+
+<div class="jb-output-code jb-render">
+
+<!-- start embedded style -->
+
+<!-- end embedded style -->
+<div class="jb-output jb-render">
+<div class="document" id="critic">
+<h1 class="title">Critic</h1>
+<div class="jb-text docutils container">
+<p>Critic evaluates the policy $\pi_\theta$ with parameter $\theta$</p>
+<blockquote>
+<p>Monte-Carlo policy evaluation</p>
+<p>Temporal difference learning</p>
+<p>TD((\lambda))</p>
+<p>Least-squares policy evaluation</p>
+</blockquote>
+</div>
+</div>
+
+</div><!-- end of jb-output jb-render -->
+</div><!-- end of jb-output-code jb-render -->
+
+
+</div>
+<!-- Footer -->
+
+<div class="jb-footer-left plain">
+    <span id="id-861ca961-fa49-4e5d-a66d-8f6c02382899" ><span id="id-861ca961-fa49-4e5d-a66d-8f6c02382899"><img id="img-id-861ca961-fa49-4e5d-a66d-8f6c02382899"     src="assets/images/logo.png"/></span>
+</span>
+
+</div>
+<div class="jb-footer-right plain">
+    <span id="id-c98740c4-6611-47f4-8769-a2e7650f938a" ><span id="id-c98740c4-6611-47f4-8769-a2e7650f938a"><img id="img-id-c98740c4-6611-47f4-8769-a2e7650f938a" width="162" height="138"   src="assets/images/robbi.png"/></span>
+</span>
+
+</div>
+
+<aside class="notes">
+
+</aside>
+
+
+
+</section>
+<section id="slide_00035_frag_00001" data-state="slide_00035_frag_00001">
+
+
+<!-- Header -->
+  
+
+<!-- Background -->
+
+
+<!-- Slide -->
+<div class="jb-slide">
+
+<div class="jb-output-code jb-render">
+
+<!-- start embedded style -->
+
+<!-- end embedded style -->
+<div class="jb-output jb-render">
+<div class="document" id="critic">
+<h1 class="title">Critic</h1>
+<div class="jb-text docutils container">
+<p>Critic evaluates the policy (\pi_\theta) with parameter (\theta)</p>
+<blockquote>
+<p>Monte-Carlo policy evaluation</p>
+<p>Temporal difference learning</p>
+<p>TD((\lambda))</p>
+<p>Least-squares policy evaluation</p>
+</blockquote>
+</div>
+</div>
+
+</div><!-- end of jb-output jb-render -->
+</div><!-- end of jb-output-code jb-render -->
+
+
+</div>
+<!-- Footer -->
+
+<div class="jb-footer-left plain">
+    <span id="id-13ec2ead-7401-465c-95bc-463ffbe7983c" ><span id="id-13ec2ead-7401-465c-95bc-463ffbe7983c"><img id="img-id-13ec2ead-7401-465c-95bc-463ffbe7983c"     src="assets/images/logo.png"/></span>
+</span>
+
+</div>
+<div class="jb-footer-right plain">
+    <span id="id-4b75d301-60e9-46d0-ae97-0f90108e924c" ><span id="id-4b75d301-60e9-46d0-ae97-0f90108e924c"><img id="img-id-4b75d301-60e9-46d0-ae97-0f90108e924c" width="162" height="138"   src="assets/images/robbi.png"/></span>
+</span>
+
+</div>
+
+<aside class="notes">
+
+</aside>
+
+
+
+</section>
+<section id="slide_00036_frag_00001" data-state="slide_00036_frag_00001">
+
+
+<!-- Header -->
+  
+
+<!-- Background -->
+
+
+<!-- Slide -->
+<div class="jb-slide">
+
+<div class="jb-output-code jb-render">
+
+<!-- start embedded style -->
+
+<!-- end embedded style -->
+<div class="jb-output jb-render">
+
+<h1>Critic</h1>
+<div class="jb-text">
+<ul>
+<li>
+    Critic evaluates the policy \(\pi_\theta\) with parameter \(\theta\)
+</li>
+<li>
+        Monte-Carlo policy evaluation 
+</li>
+<li>
+        Temporal difference learning
+</li>
+<li>
+        TD((\\lambda))
+</li>
+<li>
+        Least-squares policy evaluation
+</li>
+</ul>
+</div>
+</div><!-- end of jb-output jb-render -->
+</div><!-- end of jb-output-code jb-render -->
+
+
+</div>
+<!-- Footer -->
+
+<div class="jb-footer-left plain">
+    <span id="id-72f45b2d-ec56-4139-9dce-fae9ec6d7488" ><span id="id-72f45b2d-ec56-4139-9dce-fae9ec6d7488"><img id="img-id-72f45b2d-ec56-4139-9dce-fae9ec6d7488"     src="assets/images/logo.png"/></span>
+</span>
+
+</div>
+<div class="jb-footer-right plain">
+    <span id="id-ac4ab445-c64f-4b1a-8cb4-132eb0e585cd" ><span id="id-ac4ab445-c64f-4b1a-8cb4-132eb0e585cd"><img id="img-id-ac4ab445-c64f-4b1a-8cb4-132eb0e585cd" width="162" height="138"   src="assets/images/robbi.png"/></span>
+</span>
+
+</div>
+
+<aside class="notes">
+
+</aside>
+
+
+
+</section>
+        </div>
+        </div>
+
+        <script src="js/reveal.js"></script>
+
+        <script>
+            // More info about config & dependencies:
+            // - https://github.com/hakimel/reveal.js#configuration
+            // - https://github.com/hakimel/reveal.js#dependencies
+            Reveal.initialize({
+                math: {
+                    mathjax: 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js',
+                    config: 'TeX-AMS_HTML-full',  // See http://docs.mathjax.org/en/latest/config-files.html
+                    // tex2jax: {
+                    //     inlineMath: [['$', '$'], ['\(', '\)']],
+                    //     displayMath: [['$$', '$$'], ['\[', '\]']],
+                    //     processEscapes: true,
+                    //     processEnvironments: true,
+                    //     skipTags: ['script', 'noscript', 'style', 'textarea', 'code', 'pre'],
+                    //     displayAlign: 'center',
+                    // }                
+                },
+                dependencies: [
+                    { src: 'plugin/markdown/marked.js' },
+                    { src: 'plugin/markdown/markdown.js' },
+                    { src: 'plugin/notes/notes.js', async: true },
+                    { src: 'plugin/highlight/highlight.js', async: true, callback: function() { hljs.initHighlightingOnLoad(); } },
+                    { src: 'plugin/math/math.js', async: true }
+                ]
+            });
+        </script>
+
+        <script>
+            <!-- Assets -->
+var assets = {
+"robbi" : new JBImage( "robbi", "12677", "162", "138", null, null, "assets/images/robbi", "png" ),
+"logo" : new JBImage( "logo", "12033", "0", "0", null, null, "assets/images/logo", "png" ),
+"fira-logo-1" : new JBImage( "fira-logo-1", "93836", "0", "0", null, null, "assets/images/FIRA-logo-1", "png" ),
+"pairLogo" : new JBImage( "pairLogo", "63051", "0", "0", null, null, "assets/images/pairLogo", "png" ),
+"eq1" : new JBImage( "eq1", "9699", "0", "0", null, null, "assets/images/eq1", "svg" ),
+"v1" : new JBImage( "v1", "16574", "0", "0", null, null, "assets/images/v1", "svg" ),
+"figvar" : new JBImage( "figvar", "18928", "0", "0", null, null, "assets/images/figvar", "svg" ) 
+};
+var assetInstances = {
+    "id-728dd84d-b714-4277-8aec-62c40dfa6ff3": assets["robbi"],
+    "id-7c7c4f3b-b5fc-4182-9e23-dddbeeaa231e": assets["robbi"],
+    "id-2bb0e434-e57a-4ee5-9525-f8ac6b2c8fed": assets["robbi"],
+    "id-5c183cb7-06e3-41e5-a52c-ce5eb79ed35f": assets["robbi"],
+    "id-99201ceb-504d-41a4-8ebc-d9b24686517c": assets["robbi"],
+    "id-68bd4174-0053-4031-a532-37e90c4827f6": assets["robbi"],
+    "id-6a6b05e2-a58e-4ec8-a1ff-188008ed79a1": assets["robbi"],
+    "id-95605a8d-ff13-4a7e-a437-e6a8aefa399f": assets["robbi"],
+    "id-546da2fa-550c-456f-baea-9d3d8cfaf69a": assets["robbi"],
+    "id-933c183e-fc6c-44a2-864b-d0ae68386043": assets["robbi"],
+    "id-2167a055-4e17-4a8e-8630-99551eeaa857": assets["robbi"],
+    "id-70a32868-731e-45ff-b22b-5e0d82756177": assets["robbi"],
+    "id-2c9b4b12-f713-446c-999f-52a5717270ee": assets["robbi"],
+    "id-3192ec51-e6f2-4b2f-8d5b-db81daac0b9f": assets["robbi"],
+    "id-682fda88-884d-4cf7-bfc0-2af7f1da99b0": assets["robbi"],
+    "id-e51e6713-f341-4436-a8cf-32f79b7ad59e": assets["robbi"],
+    "id-af83efcd-bb95-49ef-8b3e-d20e17f6934a": assets["robbi"],
+    "id-56ce2dee-042e-40ff-bba2-4ac0ec7d9f38": assets["robbi"],
+    "id-d2455076-2975-4080-b10a-422da63395fa": assets["robbi"],
+    "id-8265b322-8d37-4547-b7c6-ad09dcfef71d": assets["robbi"],
+    "id-e0a3df85-6e61-4618-8b40-69fd611a468f": assets["robbi"],
+    "id-d5eb13d5-cd0a-4265-bcda-dfc1c707a69e": assets["robbi"],
+    "id-6911caa1-64b7-4f92-b68b-de1e1c8817d5": assets["robbi"],
+    "id-0378b3b4-ff78-4dfb-89bc-1b554c1911f9": assets["robbi"],
+    "id-6b6a9a60-076c-40d5-8c3b-6aaab8097e80": assets["robbi"],
+    "id-547cf347-6076-40ea-a9d4-c0cd89c87006": assets["robbi"],
+    "id-9e0aca06-c202-4601-af7c-fe98b80b53a8": assets["robbi"],
+    "id-62fb3dfa-33e7-4099-8088-86fa8d899618": assets["robbi"],
+    "id-b6586b71-5e7b-4b3e-9c92-efdd46dc7c6c": assets["robbi"],
+    "id-4511a439-d84d-47a4-8eb8-6eb79e80dc99": assets["robbi"],
+    "id-4c1bcd54-3e5f-4c7d-bfbe-fb505019d0b2": assets["robbi"],
+    "id-3daa5ada-8573-4e32-8926-88d1ee7b07ba": assets["robbi"],
+    "id-c98740c4-6611-47f4-8769-a2e7650f938a": assets["robbi"],
+    "id-4b75d301-60e9-46d0-ae97-0f90108e924c": assets["robbi"],
+    "id-ac4ab445-c64f-4b1a-8cb4-132eb0e585cd": assets["robbi"],
+    "id-6ae8a950-98a6-40b8-9470-64557af159c9": assets["logo"],
+    "id-f4541a93-3fed-4756-9510-94d851b344f8": assets["logo"],
+    "id-370537ae-114b-48e4-8190-ec2e85df90d8": assets["logo"],
+    "id-3bcf367d-10a9-4200-a753-c40ef3273697": assets["logo"],
+    "id-482d4e56-7a1a-4812-9ab2-0bd15e09cc1a": assets["logo"],
+    "id-913ef291-17a7-4fcf-b307-6a20b9be8b39": assets["logo"],
+    "id-51053fa5-351f-4bd3-a6ad-38add2b7fbd8": assets["logo"],
+    "id-d2c7168c-9e4b-400c-a4a8-c828695522f8": assets["logo"],
+    "id-6e4a42f5-ca06-49cf-9078-e1c15292a064": assets["logo"],
+    "id-6f001409-0393-421b-95d1-7f754787bf27": assets["logo"],
+    "id-afb05890-aec0-49f8-be0d-df0d4c41d0a2": assets["logo"],
+    "id-3ec9cb30-ed23-43c3-a861-6cd892fb3116": assets["logo"],
+    "id-f1521fd8-3326-4f87-83b8-d15b208570b5": assets["logo"],
+    "id-0ad483ec-6789-434e-b48c-897bb76d35b0": assets["logo"],
+    "id-0df6bcef-75cb-4be0-94eb-3985b68ba576": assets["logo"],
+    "id-fc7a1f1f-b1de-4676-a25d-fd81a96a5ed9": assets["logo"],
+    "id-4aabfaac-83d3-4edc-b861-fd953b66ddd8": assets["logo"],
+    "id-75da9fb2-1d02-4719-9d31-2c978a8bd6e4": assets["logo"],
+    "id-f37eee7c-3627-4f13-bfba-e52124c3f87d": assets["logo"],
+    "id-575232a4-9054-4e9c-9bbf-9859d7a109e8": assets["logo"],
+    "id-fdc34f36-f42a-4914-beb4-49999da9daf0": assets["logo"],
+    "id-5a47608d-b9ec-4b31-b25b-6ba2c19199e3": assets["logo"],
+    "id-c46d05ff-e669-4d4a-97fc-1a1c66e38644": assets["logo"],
+    "id-9d7dc429-6456-4044-8187-e2a7c545cb9a": assets["logo"],
+    "id-145162f1-947c-4b47-9223-dcf74c55b4e6": assets["logo"],
+    "id-121ab70e-07ee-4cf4-9d6f-71e983923fdf": assets["logo"],
+    "id-8f867262-074f-4192-ac8d-088d87841b3d": assets["logo"],
+    "id-d5a878fc-18a9-4c46-a5a5-add944c149e9": assets["logo"],
+    "id-0f16c810-826e-48fa-b045-f74487efc6ec": assets["logo"],
+    "id-c0bec296-48a0-4206-82af-ff10726591c9": assets["logo"],
+    "id-f898a302-b1e8-42c8-a9b9-9f7764a1bde4": assets["logo"],
+    "id-0b6112db-5e75-4db6-9a26-adade6f87d46": assets["logo"],
+    "id-861ca961-fa49-4e5d-a66d-8f6c02382899": assets["logo"],
+    "id-13ec2ead-7401-465c-95bc-463ffbe7983c": assets["logo"],
+    "id-72f45b2d-ec56-4139-9dce-fae9ec6d7488": assets["logo"],
+    "id-bd0a998e-5ec0-413f-bbc9-05c611e1f0e5": assets["eq1"],
+    "id-ffe71b09-8407-4f7d-aed9-091ae49c03a4": assets["v1"],
+    "id-4025aacf-279f-4ca3-88df-88ebfad17d14": assets["v1"],
+    "id-140b3a4b-97b9-4e31-8462-738758d28e00": assets["v1"],
+    "id-e62ac5de-d5ba-4bdc-aebc-18ce583422ea": assets["v1"],
+    "id-809d2217-e71a-44f5-beed-0b592c127efc": assets["v1"],
+    "id-2c155403-98be-44d5-a384-6dd6560e07d0": assets["v1"],
+    "id-5a3b9a6b-189d-4845-aadc-dc33529edfbc": assets["figvar"]
+};
+<!-- End of Assets -->
+
+            convertURLs(assetInstances, "smart-path");
+        </script>
+        <script>
+            <!-- Characters -->
+var characters =
+{};
+<!-- End of Characters -->
+
+        </script>
+    </body>
+</html>
